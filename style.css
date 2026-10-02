@@ -146,3 +146,37 @@ fieldset input { margin-right: 8px; transform: scale(1.2); }
   cursor: pointer;
   font-size: 0.85rem;
 }
+
+/* ---- Tabs ---- */
+.tabs {
+  display: flex;
+  gap: 8px;
+  background: #efe8de;
+  border-radius: 14px;
+  padding: 4px;
+  margin-bottom: 20px;
+}
+.tab {
+  flex: 1;
+  border: none;
+  background: none;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  color: #666;
+}
+.tab.active {
+  background: #fff;
+  color: #2b2b2b;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* ---- Matches ---- */
+.match { margin-bottom: 20px; }
+.small-photo { height: 240px; }
+.match-lead { margin-top: 12px; font-weight: 600; color: #2fa86a; }
+.contact { margin-top: 12px; }
+.contact-line { padding: 6px 0; word-break: break-word; }
+.contact-line a { color: #2b2b2b; }

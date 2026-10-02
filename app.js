@@ -17,8 +17,15 @@ const screens = {
   loading: document.getElementById('loadingScreen'),
   login: document.getElementById('loginScreen'),
   onboard: document.getElementById('onboardScreen'),
-  swipe: document.getElementById('swipeScreen')
+  swipe: document.getElementById('swipeScreen'),
+  matches: document.getElementById('matchesScreen')
 };
+const tabsEl = document.getElementById('tabs');
+const tabAnimals = document.getElementById('tabAnimals');
+const tabMatches = document.getElementById('tabMatches');
+const matchesStatus = document.getElementById('matchesStatus');
+const matchesList = document.getElementById('matchesList');
+const refreshMatchesBtn = document.getElementById('refreshMatchesBtn');
 const loginMessage = document.getElementById('loginMessage');
 
 const form = document.getElementById('onboardForm');
@@ -45,6 +52,11 @@ function showScreen(name) {
   Object.keys(screens).forEach(function (key) {
     screens[key].classList.toggle('hidden', key !== name);
   });
+  // The two tabs are only shown on the animals and matches screens
+  const showTabs = name === 'swipe' || name === 'matches';
+  tabsEl.classList.toggle('hidden', !showTabs);
+  tabAnimals.classList.toggle('active', name === 'swipe');
+  tabMatches.classList.toggle('active', name === 'matches');
   window.scrollTo(0, 0);
 }
 
@@ -411,6 +423,101 @@ function ageText(age) {
   return n + ' metai';
 }
 
+// ====== MATCHES ======
+async function openMatches() {
+  showScreen('matches');
+  matchesStatus.classList.remove('hidden');
+  matchesStatus.textContent = 'Kraunama...';
+  matchesList.innerHTML = '';
+
+  const res = await api('getMatches');
+
+  if (res.error === 'invalid_token') {
+    logout('Sesija baigėsi. Prisijunkite iš naujo.');
+    return;
+  }
+  if (res.error || !res.matches) {
+    matchesStatus.textContent = 'Nepavyko užkrauti sutapimų. Bandykite vėliau.';
+    return;
+  }
+  if (res.matches.length === 0) {
+    matchesStatus.textContent = 'Kol kas sutapimų nėra. Prieglaudos peržiūri jūsų anketas — užsukite vėliau! 🐾';
+    return;
+  }
+
+  matchesStatus.classList.add('hidden');
+  res.matches.forEach(function (m) {
+    matchesList.appendChild(buildMatchCard(m));
+  });
+}
+
+function buildMatchCard(m) {
+  const card = document.createElement('div');
+  card.className = 'card match';
+
+  if (m.photo) {
+    const img = document.createElement('img');
+    img.className = 'photo small-photo';
+    img.src = m.photo;
+    img.alt = m.animalName;
+    card.appendChild(img);
+  }
+
+  const info = document.createElement('div');
+  info.className = 'info';
+
+  const title = document.createElement('h2');
+  title.textContent = m.animalName + ' 💚';
+  info.appendChild(title);
+
+  const sub = document.createElement('p');
+  sub.className = 'subtitle';
+  const bits = [m.species, m.age !== '' ? ageText(m.age) : '', m.sex].filter(function (x) { return x; });
+  sub.textContent = bits.join(' · ');
+  info.appendChild(sub);
+
+  const lead = document.createElement('p');
+  lead.className = 'match-lead';
+  lead.textContent = 'Prieglauda „' + m.shelter + '“ nori su jumis susisiekti!';
+  info.appendChild(lead);
+
+  const lines = document.createElement('div');
+  lines.className = 'contact';
+  if (m.phone) lines.appendChild(contactLine('📞', m.phone, 'tel:' + m.phone.replace(/[^\d+]/g, '')));
+  if (m.email) lines.appendChild(contactLine('✉️', m.email, 'mailto:' + m.email));
+  if (m.hours) lines.appendChild(contactLine('🕘', m.hours));
+  if (m.city) lines.appendChild(contactLine('📍', m.city));
+  info.appendChild(lines);
+
+  card.appendChild(info);
+  return card;
+}
+
+function contactLine(icon, text, href) {
+  const row = document.createElement('p');
+  row.className = 'contact-line';
+  row.appendChild(document.createTextNode(icon + ' '));
+  if (href) {
+    const a = document.createElement('a');
+    a.href = href;
+    a.textContent = text;
+    row.appendChild(a);
+  } else {
+    row.appendChild(document.createTextNode(text));
+  }
+  return row;
+}
+
+// Back to the animal cards without reloading them
+function backToAnimals() {
+  if (animals.length === 0) {
+    openSwipe();
+  } else {
+    showScreen('swipe');
+    showCurrent();
+  }
+}
+
 // ====== SENDING LIKES TO THE SHELTER ======
 // Likes (and un-likes) wait in a small list on this device and are sent one by one.
 // If the internet drops, they stay in the list and are sent later.
@@ -523,6 +630,9 @@ likeBtn.addEventListener('click', function () { decide('like'); });
 undoBtn.addEventListener('click', undo);
 resetBtn.addEventListener('click', resetAll);
 editProfileBtn.addEventListener('click', openOnboarding);
+tabAnimals.addEventListener('click', backToAnimals);
+tabMatches.addEventListener('click', openMatches);
+refreshMatchesBtn.addEventListener('click', openMatches);
 logoutBtn.addEventListener('click', function () { logout(); });
 
 // ====== START ======

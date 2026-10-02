@@ -14,6 +14,12 @@
 
   <main>
 
+    <!-- TABS (shown only on the animals and matches screens) -->
+    <nav id="tabs" class="tabs hidden">
+      <button id="tabAnimals" class="tab active">🐾 Gyvūnai</button>
+      <button id="tabMatches" class="tab">💚 Sutapimai</button>
+    </nav>
+
     <!-- LOADING -->
     <section id="loadingScreen" class="screen">
       <p class="status">Kraunama...</p>
@@ -124,6 +130,13 @@
         <button id="logoutBtn" class="link">Atsijungti</button>
         <button id="resetBtn" class="link">Pradėti iš naujo (testavimui)</button>
       </div>
+    </section>
+
+    <!-- MATCHES -->
+    <section id="matchesScreen" class="screen hidden">
+      <p id="matchesStatus" class="status">Kraunama...</p>
+      <div id="matchesList"></div>
+      <button id="refreshMatchesBtn" class="link">Atnaujinti</button>
     </section>
 
   </main>
