@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prieglaudų augintiniai</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🐾 Rask namus augintiniui</h1>
+  </header>
+
+  <main>
+    <p id="status" class="status">Kraunama...</p>
+
+    <div id="card" class="card hidden">
+      <img id="photo" class="photo" alt="">
+      <div class="info">
+        <h2 id="name"></h2>
+        <p id="subtitle" class="subtitle"></p>
+        <div id="tags" class="tags"></div>
+      </div>
+    </div>
+
+    <div id="buttons" class="buttons hidden">
+      <button id="undoBtn" class="btn small" title="Grįžti atgal" disabled>↩</button>
+      <button id="passBtn" class="btn big pass" title="Ne">✕</button>
+      <button id="likeBtn" class="btn big like" title="Taip">♥</button>
+    </div>
+
+    <p id="counter" class="counter"></p>
+    <button id="resetBtn" class="link">Pradėti iš naujo (testavimui)</button>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
