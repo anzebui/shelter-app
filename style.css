@@ -25,6 +25,59 @@ main {
 
 .status { margin: 40px 0; color: #777; }
 
+.lead { margin: 24px 0; color: #444; }
+.lead.small { margin: 8px 0 20px; color: #777; font-size: 0.95rem; }
+
+.error { color: #c0392b; margin: 12px 0; font-size: 0.95rem; }
+
+.google-btn { display: flex; justify-content: center; margin: 24px 0; }
+
+/* ---- Onboarding form ---- */
+#onboardScreen { text-align: left; }
+#onboardScreen h2 { text-align: center; }
+#onboardScreen .lead { text-align: center; }
+
+.field { display: block; margin-bottom: 16px; }
+.field span { display: block; font-weight: 600; margin-bottom: 6px; }
+.field input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d9d2c8;
+  border-radius: 12px;
+  font-size: 1rem;
+  background: #fff;
+}
+
+fieldset {
+  border: none;
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+legend { font-weight: 600; padding: 0 4px; }
+fieldset label { display: block; padding: 8px 0; cursor: pointer; }
+fieldset input { margin-right: 8px; transform: scale(1.2); }
+
+.check { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 14px; font-size: 0.95rem; }
+.check input { margin-top: 4px; transform: scale(1.2); }
+
+.primary {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  background: #2fa86a;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+}
+.primary:disabled { opacity: 0.5; cursor: default; }
+
+/* ---- Animal card ---- */
 .card {
   background: #fff;
   border-radius: 20px;
@@ -77,12 +130,19 @@ main {
 
 .counter { margin-top: 16px; color: #888; font-size: 0.9rem; }
 
-.link {
+.footer-links {
   margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.link {
   background: none;
   border: none;
   color: #999;
   text-decoration: underline;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
 }

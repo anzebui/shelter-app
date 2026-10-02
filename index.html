@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Prieglaudų augintiniai</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <header>
@@ -12,25 +13,119 @@
   </header>
 
   <main>
-    <p id="status" class="status">Kraunama...</p>
 
-    <div id="card" class="card hidden">
-      <img id="photo" class="photo" alt="">
-      <div class="info">
-        <h2 id="name"></h2>
-        <p id="subtitle" class="subtitle"></p>
-        <div id="tags" class="tags"></div>
+    <!-- LOADING -->
+    <section id="loadingScreen" class="screen">
+      <p class="status">Kraunama...</p>
+    </section>
+
+    <!-- LOGIN -->
+    <section id="loginScreen" class="screen hidden">
+      <p class="lead">Prisijunkite, kad galėtumėte peržiūrėti prieglaudų gyvūnus.</p>
+      <div id="googleBtn" class="google-btn"></div>
+      <p id="loginMessage" class="error hidden"></p>
+    </section>
+
+    <!-- ONBOARDING -->
+    <section id="onboardScreen" class="screen hidden">
+      <h2>Papasakokite apie save</h2>
+      <p class="lead small">Tai padės prieglaudoms pasirinkti tinkamus globėjus.</p>
+
+      <form id="onboardForm" novalidate>
+        <label class="field">
+          <span>Vardas ir pavardė</span>
+          <input type="text" name="fullName" autocomplete="name">
+        </label>
+
+        <label class="field">
+          <span>Telefono numeris</span>
+          <input type="tel" name="phone" autocomplete="tel" placeholder="+370...">
+        </label>
+
+        <fieldset>
+          <legend>Kodėl naudojatės programėle? (galima pasirinkti kelis)</legend>
+          <label><input type="checkbox" name="purpose" value="Laikina globa"> Laikina globa</label>
+          <label><input type="checkbox" name="purpose" value="Įvaikinimas"> Įvaikinimas</label>
+          <label><input type="checkbox" name="purpose" value="Tik apsidairau"> Tik apsidairau</label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Kokie gyvūnai jus domina? (galima pasirinkti kelis)</legend>
+          <label><input type="checkbox" name="animals" value="Šunys"> Šunys</label>
+          <label><input type="checkbox" name="animals" value="Katės"> Katės</label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Kur gyvenate?</legend>
+          <label><input type="radio" name="housing" value="Butas"> Butas</label>
+          <label><input type="radio" name="housing" value="Namas su nedideliu sodu"> Namas su nedideliu sodu</label>
+          <label><input type="radio" name="housing" value="Namas su dideliu kiemu"> Namas su dideliu kiemu</label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Ar turite vaikų iki 14 metų?</legend>
+          <label><input type="radio" name="kids" value="Taip"> Taip</label>
+          <label><input type="radio" name="kids" value="Ne"> Ne</label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Ar turite kitų augintinių?</legend>
+          <label><input type="radio" name="pets" value="Taip"> Taip</label>
+          <label><input type="radio" name="pets" value="Ne"> Ne</label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Ar galėtumėte priimti neįgalų augintinį?</legend>
+          <label><input type="radio" name="disabledOk" value="Taip"> Taip</label>
+          <label><input type="radio" name="disabledOk" value="Priklauso"> Priklauso</label>
+          <label><input type="radio" name="disabledOk" value="Ne"> Ne</label>
+        </fieldset>
+
+        <label class="check">
+          <input type="checkbox" name="adult">
+          <span>Man yra 18 metų arba daugiau</span>
+        </label>
+
+        <label class="check">
+          <input type="checkbox" name="consent">
+          <span>Sutinku, kad mano vardas, el. paštas, telefono numeris ir šie atsakymai būtų perduoti prieglaudoms, kurių gyvūnams paspausiu ♥.</span>
+        </label>
+
+        <p id="formError" class="error hidden"></p>
+
+        <button type="submit" id="saveProfileBtn" class="primary">Išsaugoti ir pradėti</button>
+        <button type="button" id="cancelOnboardBtn" class="link hidden">Atšaukti</button>
+      </form>
+    </section>
+
+    <!-- SWIPE -->
+    <section id="swipeScreen" class="screen hidden">
+      <p id="status" class="status">Kraunama...</p>
+
+      <div id="card" class="card hidden">
+        <img id="photo" class="photo" alt="">
+        <div class="info">
+          <h2 id="name"></h2>
+          <p id="subtitle" class="subtitle"></p>
+          <div id="tags" class="tags"></div>
+        </div>
       </div>
-    </div>
 
-    <div id="buttons" class="buttons hidden">
-      <button id="undoBtn" class="btn small" title="Grįžti atgal" disabled>↩</button>
-      <button id="passBtn" class="btn big pass" title="Ne">✕</button>
-      <button id="likeBtn" class="btn big like" title="Taip">♥</button>
-    </div>
+      <div id="buttons" class="buttons hidden">
+        <button id="undoBtn" class="btn small" title="Grįžti atgal" disabled>↩</button>
+        <button id="passBtn" class="btn big pass" title="Ne">✕</button>
+        <button id="likeBtn" class="btn big like" title="Taip">♥</button>
+      </div>
 
-    <p id="counter" class="counter"></p>
-    <button id="resetBtn" class="link">Pradėti iš naujo (testavimui)</button>
+      <p id="counter" class="counter"></p>
+
+      <div class="footer-links">
+        <button id="editProfileBtn" class="link">Keisti anketą</button>
+        <button id="logoutBtn" class="link">Atsijungti</button>
+        <button id="resetBtn" class="link">Pradėti iš naujo (testavimui)</button>
+      </div>
+    </section>
+
   </main>
 
   <script src="app.js"></script>
