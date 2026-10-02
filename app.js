@@ -317,6 +317,7 @@ cancelOnboardBtn.addEventListener('click', function () {
 // ====== ANIMALS ======
 async function openSwipe() {
   showScreen('swipe');
+  flushOps(); // send any likes that are still waiting
   cardEl.classList.add('hidden');
   buttonsEl.classList.add('hidden');
   statusEl.classList.remove('hidden');
@@ -410,6 +411,79 @@ function ageText(age) {
   return n + ' metai';
 }
 
+// ====== SENDING LIKES TO THE SHELTER ======
+// Likes (and un-likes) wait in a small list on this device and are sent one by one.
+// If the internet drops, they stay in the list and are sent later.
+let flushing = false;
+let inFlight = null; // the request being sent right now
+
+function opsKey() {
+  return 'ops_' + (session ? session.email : 'anon');
+}
+
+function loadOps() {
+  try {
+    return JSON.parse(localStorage.getItem(opsKey())) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveOps(ops) {
+  try { localStorage.setItem(opsKey(), JSON.stringify(ops)); } catch (e) {}
+}
+
+function queueOp(type, animalId) {
+  const ops = loadOps();
+  // If a like was never sent yet, un-liking just cancels it
+  const idx = ops.findIndex(function (o) {
+    return o.type === 'like' && o.animalId === animalId;
+  });
+  const isSendingNow = inFlight && inFlight.type === 'like' && inFlight.animalId === animalId;
+  if (type === 'unlike' && idx !== -1 && !isSendingNow) {
+    ops.splice(idx, 1);
+  } else {
+    ops.push({ type: type, animalId: animalId });
+  }
+  saveOps(ops);
+  flushOps();
+}
+
+async function flushOps() {
+  if (flushing || !session) return;
+  flushing = true;
+  try {
+    let ops = loadOps();
+    while (ops.length > 0) {
+      const op = ops[0];
+      inFlight = op;
+      const res = await api(op.type, { animalId: op.animalId });
+      inFlight = null;
+
+      if (res.error === 'invalid_token') {
+        flushing = false;
+        logout('Sesija baigėsi. Prisijunkite iš naujo.');
+        return;
+      }
+      if (res.error === 'network') break; // keep it in the list, try again later
+      if (res.error) console.warn('Server refused', op, res.error);
+
+      // Done (or permanently refused): remove this request from the list
+      ops = loadOps();
+      const i = ops.findIndex(function (o) {
+        return o.type === op.type && o.animalId === op.animalId;
+      });
+      if (i !== -1) ops.splice(i, 1);
+      saveOps(ops);
+    }
+  } finally {
+    inFlight = null;
+    flushing = false;
+  }
+}
+
+window.addEventListener('online', flushOps);
+
 // ====== BUTTONS ======
 function decide(choice) {
   if (queue.length === 0) return;
@@ -417,20 +491,26 @@ function decide(choice) {
   decisions[a.id] = choice;
   saveDecisions();
   lastSwipe = a;
-  // Step 6 (later): if choice === 'like', send the like to the shelter's file
+  if (choice === 'like') queueOp('like', a.id);
   showCurrent();
 }
 
 function undo() {
   if (!lastSwipe) return;
+  const wasLike = decisions[lastSwipe.id] === 'like';
   delete decisions[lastSwipe.id];
   saveDecisions();
+  if (wasLike) queueOp('unlike', lastSwipe.id);
   queue.unshift(lastSwipe);
   lastSwipe = null; // only one step back is allowed
   showCurrent();
 }
 
+// For testing: forget all decisions and also withdraw all likes
 function resetAll() {
+  Object.keys(decisions).forEach(function (id) {
+    if (decisions[id] === 'like') queueOp('unlike', id);
+  });
   decisions = {};
   saveDecisions();
   lastSwipe = null;
